@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 delegate Point GetPosition(double time);
 
@@ -19,6 +20,7 @@ class ProjectileFlight
     readonly double initSpeed;
     readonly double angle;
     readonly double g = 9.8;
+    readonly int precision = 2;
 
     public ProjectileFlight(double initSpeed, double angle)
     {
@@ -30,8 +32,6 @@ class ProjectileFlight
     {
         double x = this.initSpeed * time * Math.Cos(this.angle);
         double y = this.initSpeed * time * Math.Sin(this.angle) - 0.5 * this.g * time * time;
-
-        int precision = 2;
 
         double xRounded = Math.Round(x, precision, MidpointRounding.AwayFromZero);
         double yRounded = Math.Round(y, precision, MidpointRounding.AwayFromZero);
@@ -65,6 +65,19 @@ class Motion
           time += period;
         }
     }
+
+    public void write(string path)
+    {
+      using (StreamWriter sw =   File.CreateText(path))
+      {
+       sw.WriteLine("x  y");
+        
+       foreach(Point p in Points)
+        {
+          sw.WriteLine($"{p.X} {p.Y}");
+        }
+      }
+    }
 }
 
 class Program
@@ -75,6 +88,7 @@ class Program
       double period = 1 / FPS;
       double initSpeed = 31;
       double angle = 60;
+      string path = "positions.txt";
     
       ProjectileFlight pf = new ProjectileFlight(initSpeed, angle);
     
@@ -84,11 +98,7 @@ class Program
 
       m.calculate(getP);
 
-      Console.WriteLine("x  y");
-    
-      foreach(Point p in m.Points)
-      {
-        Console.WriteLine($"{p.X} {p.Y}");
-      }
+      m.write(path);
   }
 }
+
