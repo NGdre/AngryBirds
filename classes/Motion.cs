@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-class Motion
+public class Motion
 {
     public List<Point> Points = new List<Point>();
     readonly double period = 1;
@@ -20,7 +20,7 @@ class Motion
         {
             k = time / 2;
 
-            Point p = cb(time, period, Points, i, 50, k);
+            Point p = cb(time, period, Points, i, k);
 
             if (p.Y < 0) break;
 
@@ -32,7 +32,7 @@ class Motion
 
     public void Write(string path)
     {
-        using StreamWriter sw = File.CreateText(path);
+        StreamWriter sw = File.CreateText(path);
 
         sw.WriteLine("x  y");
 
@@ -50,6 +50,14 @@ class Motion
         {
             Console.WriteLine($"{p.X} {p.Y}");
         }
+    }
+
+    public string GetPoint(int i)
+    {
+        Point p = Points[i];
+
+        //нужно проверить существует ли точка
+        return $"{p.X} {p.Y}";
     }
 }
 
