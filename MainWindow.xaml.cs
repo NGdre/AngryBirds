@@ -28,22 +28,58 @@ namespace FrontAngryBirds
         }
         private void Start(object sender, RoutedEventArgs e)
         {
-            initSpeed = Convert.ToDouble(Velocity.Text.ToString());
-            angle = Convert.ToDouble(Angle.Text.ToString());
-            weight = Convert.ToDouble(Weight.Text.ToString());
+            if (TextBoxesAreValid())
+            {
+                ProjectileFlight pf = new ProjectileFlight(initSpeed, angle, weight);
 
-            ProjectileFlight pf = new ProjectileFlight(initSpeed, angle, weight);
+                GetPosition getP = new GetPosition(pf.GetPosition);
 
-            GetPosition getP = new GetPosition(pf.GetPosition);
+                m = new Motion(period);
 
-            m = new Motion(period);
+                m.Calculate(getP);
 
-            m.Calculate(getP);
+                tmr = new DispatcherTimer();
+                tmr.Interval = TimeSpan.FromMilliseconds(0.5);
+                tmr.Tick += new EventHandler(TimerOnTick);
+                tmr.Start();
+            }
+        }
 
-            tmr = new DispatcherTimer();
-            tmr.Interval = TimeSpan.FromMilliseconds(0.5);
-            tmr.Tick += new EventHandler(TimerOnTick);
-            tmr.Start();
+        private bool TextBoxesAreValid()
+        {
+            double num;
+
+            if (double.TryParse(Velocity.Text.ToString(), out num) && num > 0)
+            {
+                initSpeed = num;
+            }
+            else
+            {
+                MessageBox.Show("Вы должны ввести положительное число");
+                return false;
+            }
+
+            if (double.TryParse(Angle.Text.ToString(), out num) && num > 0 && num < 90)
+            {
+                angle = num;
+            }
+            else
+            {
+                MessageBox.Show("Угол должен должен быть меньше 90 градусов и больше 0");
+                return false;
+            }
+
+            if (double.TryParse(Weight.Text.ToString(), out num) && num > 0)
+            {
+                weight = num;
+            }
+            else
+            {
+                MessageBox.Show("Вы должны ввести положительное число");
+                return false;
+            }
+
+            return true;
         }
 
         int i = 0;
