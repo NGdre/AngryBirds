@@ -21,5 +21,15 @@
 
         <Button Content="start" HorizontalAlignment="Left" Height="22" VerticalAlignment="Top" Width="64" Click="Start" Canvas.Left="1014" Canvas.Top="124"/>
         <Button Content="try again" HorizontalAlignment="Left" Height="22" VerticalAlignment="Top" Width="64" Click="Retry" Canvas.Left="1094" Canvas.Top="124"/>
+
+
+        <Label Name="FileName" FontSize="15" Content="Текущий путь файла:" Canvas.Top="79" Canvas.Left="20" />
+        <Button Height="22" VerticalAlignment="Top" Width="100" Canvas.Left="20" Canvas.Top="22" Click="PickFile">Выбрать файл</Button>
+
+        <StackPanel Name="stackPanel" Canvas.Left="200" Canvas.Top="22">
+            <RadioButton Name="defaultRB" GroupName="Languages" Content="работа по умолчанию" Checked="PickFileMode" IsChecked="True" />
+            <RadioButton Name="writeRB" GroupName="Languages" Content="записывать в файл" Checked="PickFileMode" />
+            <RadioButton Name="readRB" GroupName="Languages" Content="использовать координаты из файла" Checked="PickFileMode" />
+        </StackPanel>
     </Canvas>
 </Window>

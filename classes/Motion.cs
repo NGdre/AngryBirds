@@ -30,15 +30,41 @@ public class Motion
         }
     }
 
-    public void Write(string path)
+    public async void Write(string path)
     {
-        StreamWriter sw = File.CreateText(path);
-
-        sw.WriteLine("x  y");
-
-        foreach (Point p in Points)
+        using (StreamWriter outputFile = new StreamWriter(path))
         {
-            sw.WriteLine($"{p.X} {p.Y}");
+            foreach (Point p in Points)
+            {
+                await outputFile.WriteLineAsync($"{p.X} {p.Y}");
+            }
+        }
+    }
+
+    public void Read(string path)
+    {
+        using (StreamReader sr = new StreamReader(path))
+        {
+            string s;
+
+            while ((s = sr.ReadLine()) != null)
+            {
+                string[] subs = s.Split();
+
+                if (!double.TryParse(subs[0], out double X))
+                {
+                    return;
+                }
+
+                if (!double.TryParse(subs[1], out double Y))
+                {
+                    return;
+                }
+
+                Point p = new Point(X, Y);
+
+                Points.Add(p);
+            }
         }
     }
 

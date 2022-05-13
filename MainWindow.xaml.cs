@@ -3,6 +3,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
 
+using Microsoft.Win32;
+
 using PointX = System.Windows.Point;
 
 namespace FrontAngryBirds
@@ -17,6 +19,8 @@ namespace FrontAngryBirds
         public Motion m;
         public PointX startPosition = new PointX(150, 570);
         DispatcherTimer tmr;
+        public string fileName;
+        public string fileMode = "default";
 
         double stretchOfAxis = 3;
         public MainWindow()
@@ -28,21 +32,33 @@ namespace FrontAngryBirds
         }
         private void Start(object sender, RoutedEventArgs e)
         {
-            if (TextBoxesAreValid())
+            if (!TextBoxesAreValid()) return;
+            
+            ProjectileFlight pf = new ProjectileFlight(initSpeed, angle, weight);
+
+            GetPosition getP = new GetPosition(pf.GetPosition);
+
+            m = new Motion(period);
+
+            if ((fileMode == "write" || fileMode == "read") && fileName == null)
             {
-                ProjectileFlight pf = new ProjectileFlight(initSpeed, angle, weight);
+                MessageBox.Show("сначала нужно выбрать файл!");
+                return;
+            }
 
-                GetPosition getP = new GetPosition(pf.GetPosition);
-
-                m = new Motion(period);
-
+            if (fileMode != "read")
                 m.Calculate(getP);
 
-                tmr = new DispatcherTimer();
-                tmr.Interval = TimeSpan.FromMilliseconds(0.5);
-                tmr.Tick += new EventHandler(TimerOnTick);
-                tmr.Start();
-            }
+            if (fileMode == "write") m.Write(fileName);
+
+            if (fileMode == "read")
+                m.Read(fileName);
+
+            tmr = new DispatcherTimer();
+            tmr.Interval = TimeSpan.FromMilliseconds(0.5);
+            tmr.Tick += new EventHandler(TimerOnTick);
+            tmr.Start();
+            
         }
 
         private bool TextBoxesAreValid()
@@ -101,6 +117,36 @@ namespace FrontAngryBirds
             else tmr.Stop();
 
             i++;
+        }
+
+        private void PickFile(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+
+            openFileDialog.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                fileName = openFileDialog.FileName;
+                FileName.Content = "Текущий путь файла: " + fileName;
+            }
+        }
+
+        private void PickFileMode(object sender, RoutedEventArgs e)
+        {
+            if (!IsInitialized) return;
+
+            if (e.OriginalSource is RadioButton radioButton)
+            {
+                MessageBox.Show("выбран режим: " + radioButton.Content, Title);
+
+                if (radioButton.Name == "defaultRB")
+                    fileMode = "default";
+                else if (radioButton.Name == "writeRB")
+                    fileMode = "write";
+                else 
+                    fileMode = "read";
+            }
         }
     }
 
